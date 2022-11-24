@@ -14,7 +14,7 @@ const AlertSchema = new Schema(
 		},
 		type: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Alert',
+			ref: 'AlertType',
 			required: true
 		},
 		user: {

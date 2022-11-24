@@ -1,4 +1,6 @@
 const AlertTypeService = require('../../services/AlertType');
+const { verifyNumberType } = require('../../utils/MiscUtils');
+const { verifyID } = require('../../utils/MongoUtils');
 
 const controller = {};
 
@@ -16,8 +18,10 @@ controller.create = async (req, res) => {
 
 		res.status(201).json(createAlertType.content);
 	} catch (error) {
+		
 		return res.status(500).json({
 			error: 'Internal Server Error'
+			
 		});
 	}
 };
@@ -35,6 +39,7 @@ controller.findAll = async (req, res) => {
 		const alertTypeResponse = await AlertTypeService.findAll(parseInt(page), parseInt(limit));
 		res.status(200).json(alertTypeResponse.content);
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({ error: error.message });
 	}
 };
@@ -47,7 +52,7 @@ controller.deleteOneByID = async (req, res) => {
 			error: 'AlertType in ID'
 		});
 	}
-
+	
 	try {
 		const alertTypeExists = await AlertTypeService.findOneByID(_id);
 		if (!alertTypeExists.success) {
@@ -60,6 +65,27 @@ controller.deleteOneByID = async (req, res) => {
 		}
 
 		res.status(200).json(deleted.content);
+	} catch (error) {
+		return res.status(500).json({ error: error.message });
+	}
+};
+
+controller.findOneByID = async (req, res) => {
+	const { _id } = req.params;
+
+	if (!verifyID(_id)) {
+		return res.status(400).json({
+			error: 'Error in Type ID'
+		});
+	}
+
+	try {
+		const alertTypeExists = await AlertTypeService.findOneByID(_id);
+		if (!alertTypeExists.success) {
+			return res.status(404).json(alertTypeExists.content);
+		}
+
+		res.status(200).json(alertTypeExists.content);
 	} catch (error) {
 		return res.status(500).json({ error: error.message });
 	}

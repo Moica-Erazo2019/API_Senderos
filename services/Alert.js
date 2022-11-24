@@ -1,26 +1,16 @@
 const AlertModel = require('../models/Alert');
+const AlertTypeService = require('./AlertType');
 const service = {};
 
 //Verificacion
- service.verifyCreateFields = ({ latitud, longitud, type, user}) => {
+ service.verifyCreateFields = ({ latitud, longitud, type}) => {
     let serviceResponse = {
 		success: true,
 		content: {
 			message: 'Alert created '
 		}
 	};
-
-	if (!user) {
-		serviceResponse = {
-			success: false,
-			content: {
-				error: 'User is required'
-			}
-		};
-
-		return serviceResponse;
-	}
-
+	
 	if (!type) {
 		serviceResponse = {
 			success: false,
@@ -59,21 +49,33 @@ const service = {};
     
  /**Crear alerta */
 
- service.create = async ({ latitud, longitud, typeID}, userID) => {
+ service.create = async (latitud, longitud, typeID, userID) => {
 	let serviceResponse = {
 		success: true,
 		content: {
 			message: 'Alert created succesfully'
 		}
 	};
-
+	
 	try {
+		const alertFound = await AlertTypeService.findOneByID(typeID);
+		if(!alertFound){
+			serviceResponse = {
+				success: false,
+				content: {
+					error: 'AlertType not found'
+				}
+			};
+			return serviceResponse;
+		}
+
 		const alert = new AlertModel({
 			latitud,
 			longitud,
 			type: typeID,
-			user: userID,
+			user: userID
 		});
+		console.log('Printing alert: '+alert);
 
 		const alertSaved = await alert.save();
 
@@ -156,6 +158,7 @@ service.findAll = async (page, limit) => {
 			]
 		})
 			.populate('user', 'username _id')
+			//.populate({ path: 'type', select: 'name' })
 			.exec();
 
 		serviceResponse.content = {

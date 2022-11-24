@@ -85,7 +85,7 @@ service.findAll = async (page, limit) => {
 			.exec();
 
 		serviceResponse.content = {
-			alerts,
+			alertsType,
 			count: alertsType.length,
 			page,
 			limit
@@ -121,6 +121,34 @@ service.deleteOneByID = async (_id) => {
 		return serviceResponse;
 	} catch (error) {
 		throw new Error('Internal Server Error');
+	}
+};
+
+service.findOneByID = async (_id) => {
+	let serviceResponse = {
+		success: true,
+		content: {
+			message: 'AlertType Found'
+		}
+	};
+
+	try {
+		const alertType = await AlertTypeModel.findById(_id).exec();
+
+		if (!alertType) {
+			serviceResponse = {
+				success: false,
+				content: {
+					error: 'AlertType not found'
+				}
+			};
+		} else {
+			serviceResponse.content = alertType;
+		}
+
+		return serviceResponse;
+	} catch (error) {
+		throw error;
 	}
 };
 module.exports = service;

@@ -12,15 +12,22 @@ controller.create = async (req, res) => {
 	}
 
 	try {
+		//console.log('Printing body: ', req.body);
 		const { user } = req;
-		//const image = req.file.path;
-		const createAlert = await Alertervice.create(req.body, user._id);
+		if (!verifyID(req.body.type)) {
+			return res.status(400).json({
+				error: 'Error in AlertType ID'
+			});
+		}
+		
+		const createAlert = await AlertService.create(req.body.latitud, req.body.longitud, req.body.type , user._id);
 		if (!createAlert.success) {
 			return res.status(409).json(createAlert.content);
 		}
 
 		res.status(201).json(createAlert.content);
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({
 			error: 'Internal Server Error'
 		});

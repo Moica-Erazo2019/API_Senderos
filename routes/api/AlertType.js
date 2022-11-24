@@ -9,4 +9,6 @@ router.get('/all', AlertTypeController.findAll);
 
 router.delete('/delete/:_id', AlertTypeController.deleteOneByID);
 
+router.get('/details/:_id', AlertTypeController.findOneByID);
+
 module.exports = router;
